@@ -101,19 +101,3 @@ class Database:
             print("Import Complete!")
             self.connection.commit()
             return transactions
-
-
-def main():
-
-    table = sys.argv[1]
-    csv_file = sys.argv[2]
-
-    db = Database(
-        host="10.69.69.107", user="root", password="1234", database="PurchaseHistory"
-    )
-
-    db.import_csv(table, csv_file)
-
-
-if __name__ == "__main__":
-    main()
