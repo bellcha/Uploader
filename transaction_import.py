@@ -40,7 +40,7 @@ class Account(Enum):
     Merchants_and_Marine_Bank = 2
     Citi_Custom_Cash_Credit_Card = 3
     Target_Red_Card = 4
-    Capital_One_Savor_Card = 4
+    Capital_One_Savor_Card = 5
 
 
 @dataclass
