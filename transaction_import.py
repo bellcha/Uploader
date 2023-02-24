@@ -56,18 +56,17 @@ class Transaction:
             self.transaction_date, "%m/%d/%y"
         ).strftime("%Y-%m-%d")
         self.amount = float(self.amount)
-        self.account = int(self.account)
 
     # Converts the Category Name to the corresponding CategoyID in the Database.
     @property
     def category_id(self):
         #no_spaces = self.category.split(" ")
         #return Category["_".join(no_spaces)].value
-        return Category[Transaction._convert_spaces(self.category)]
+        return Category[Transaction._convert_spaces(self.category)].value
     
     @property
     def account_id(self):
-        return Account[Transaction._convert_spaces(self.account)]
+        return Account[Transaction._convert_spaces(self.account)].value
     
     @classmethod
     def _convert_spaces(cls, value: str):
