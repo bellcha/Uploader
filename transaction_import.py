@@ -60,19 +60,16 @@ class Transaction:
     # Converts the Category Name to the corresponding CategoyID in the Database.
     @property
     def category_id(self):
-        #no_spaces = self.category.split(" ")
-        #return Category["_".join(no_spaces)].value
         return Category[Transaction._convert_spaces(self.category)].value
-    
+
     @property
     def account_id(self):
         return Account[Transaction._convert_spaces(self.account)].value
-    
+
     @classmethod
     def _convert_spaces(cls, value: str):
         no_spaces = value.split(" ")
         return "_".join(no_spaces)
-        
 
 
 class Database:
