@@ -35,6 +35,14 @@ class Category(Enum):
     Deposit = 26
 
 
+class Account(Enum):
+    Citi_Double_Cash_Credit_Card = 1
+    Merchants_and_Marine_Bank = 2
+    Citi_Custom_Cash_Credit_Card = 3
+    Target_Red_Card = 4
+    Capital_One_Savor_Card = 4
+
+
 @dataclass
 class Transaction:
     transaction_date: datetime
@@ -53,8 +61,19 @@ class Transaction:
     # Converts the Category Name to the corresponding CategoyID in the Database.
     @property
     def category_id(self):
-        no_spaces = self.category.split(" ")
-        return Category["_".join(no_spaces)].value
+        #no_spaces = self.category.split(" ")
+        #return Category["_".join(no_spaces)].value
+        return Category[Transaction._convert_spaces(self.category)]
+    
+    @property
+    def account_id(self):
+        return Account[Transaction._convert_spaces(self.account)]
+    
+    @classmethod
+    def _convert_spaces(cls, value: str):
+        no_spaces = value.split(" ")
+        return "_".join(no_spaces)
+        
 
 
 class Database:
@@ -83,7 +102,7 @@ class Database:
 
             for transaction in transactions:
 
-                insert_statement = "INSERT INTO {table} (transaction_date, amount, description, categoryID, account) VALUES(%s, %s, %s, %s, %s)".format(
+                insert_statement = "INSERT INTO {table} (transaction_date, amount, description, category, account) VALUES(%s, %s, %s, %s, %s)".format(
                     table=table
                 )
                 print(f"Inserting {transaction}")
@@ -95,7 +114,7 @@ class Database:
                         transaction.amount,
                         transaction.description,
                         transaction.category_id,
-                        transaction.account,
+                        transaction.account_id,
                     ),
                 )
             print("Import Complete!")
