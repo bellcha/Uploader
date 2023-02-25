@@ -1,5 +1,4 @@
 import csv
-import sys
 import mysql.connector
 from datetime import datetime
 from dataclasses import dataclass
@@ -44,6 +43,32 @@ class Account(Enum):
 
 
 @dataclass
+class TransactionHistory:
+    id: int
+    date: datetime
+    amount: float
+    description: str
+    category_id: int
+    account_id: int
+
+    def __post_init__(self):
+        self.date = self.date.strftime("%m-%d-%Y")
+
+    @property
+    def category(self):
+        return TransactionHistory._convert_spaces(Category(self.category_id).name)
+
+    @property
+    def account(self):
+        return TransactionHistory._convert_spaces(Account(self.account_id).name)
+
+    @classmethod
+    def _convert_spaces(cls, value: str):
+        no_spaces = value.split("_")
+        return " ".join(no_spaces)
+
+
+@dataclass
 class Transaction:
     transaction_date: datetime
     amount: float
@@ -82,13 +107,19 @@ class Database:
             print(f"Error connecting to Database: {e}")
 
     def select_all(self, table):
-        query = f"SELECT * FROM {table}"
+        query = f"SELECT * FROM {table} ORDER BY transaction_date DESC"
 
         cursor = self.connection.cursor()
 
         cursor.execute(query)
 
-        return cursor
+        trans = cursor.fetchall()
+
+        trans_list = [
+            TransactionHistory(t[0], t[1], t[2], t[3], t[4], t[5]) for t in trans
+        ]
+
+        return trans_list[:16]
 
     def import_csv(self, table, csv_file):
         cursor = self.connection.cursor()

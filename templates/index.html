@@ -7,12 +7,15 @@
     <title>Home</title>
 </head>
 <body>
-    <h1>Transaction History CSV File Upload</h1>
-
-    <form method='POST' enctype='multipart/form-data'>
-        {{form.hidden_tag()}}
-        {{form.file()}}
-        {{form.submit()}}
-    </form>
+    <h1><a href="{{ url_for('upload') }}">Click here to Upload a CSV File</a></h1>
+    <h1>Transaction History</h1>
+    {%for t in trans_history%}
+        <p>Date: {{t.date}}</p>
+        <p>Amount: {{t.amount}}</p>
+        <p>Description: {{t.description}}</p>
+        <p>Category: {{t.category}}</p>
+        <p>Account: {{t.account}}</p>
+        <p>-----------</p>
+    {%endfor%}
 </body>
 </html>

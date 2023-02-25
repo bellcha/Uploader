@@ -7,11 +7,12 @@
     <title>Home</title>
 </head>
 <body>
-    <h1>Transactions Uploaded</h1>
+    <h1>Transaction History CSV File Upload</h1>
 
-    {%for f in form%}
-        <p>{{f}}</p>
-    {%endfor%}
-    <h2><a href="{{ url_for('home') }}">Click here to go Home</a></h2>
+    <form method='POST' enctype='multipart/form-data'>
+        {{form.hidden_tag()}}
+        {{form.file()}}
+        {{form.submit()}}
+    </form>
 </body>
 </html>

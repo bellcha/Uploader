@@ -31,9 +31,15 @@ db = Database(host=host, user=user, password=passwd, database=database)
 
 
 @app.route("/", methods=["GET", "POST"])
-@app.route("/home", methods=["GET", "POST"])
 def home():
+    trans_history = db.select_all("transactions")
+    return render_template("index.html", trans_history=trans_history)
+
+
+@app.route("/upload", methods=["GET", "POST"])
+def upload():
     form = UploadFileForm()
+
     if form.validate_on_submit():
         file = form.file.data  # First grab the file
         file_upload = os.path.join(
@@ -44,7 +50,7 @@ def home():
         file.save(file_upload)  # Then save the file
         transactions = db.import_csv(table, file_upload)
         return render_template("upload_list.html", form=transactions)
-    return render_template("index.html", form=form)
+    return render_template("upload.html", form=form)
 
 
 if __name__ == "__main__":
