@@ -91,6 +91,16 @@ class Transaction:
     def account_id(self):
         return Account[Transaction._convert_spaces(self.account)].value
 
+    @property
+    def insert_value(self):
+        return (
+            self.transaction_date,
+            self.amount,
+            self.description,
+            self.category_id,
+            self.account_id,
+        )
+
     @classmethod
     def _convert_spaces(cls, value: str):
         no_spaces = value.split(" ")
@@ -125,25 +135,13 @@ class Database:
         cursor = self.connection.cursor()
         with open(csv_file, "r") as file:
             lines = csv.DictReader(file)
-            transactions = [Transaction(**line) for line in lines]
+            transactions = [Transaction(**line).insert_value for line in lines]
 
-            for transaction in transactions:
+            insert_statement = "INSERT INTO {table} (transaction_date, amount, description, category, account) VALUES(%s, %s, %s, %s, %s)".format(
+                table=table
+            )
 
-                insert_statement = "INSERT INTO {table} (transaction_date, amount, description, category, account) VALUES(%s, %s, %s, %s, %s)".format(
-                    table=table
-                )
-                print(f"Inserting {transaction}")
+            cursor.executemany(insert_statement, transactions)
 
-                cursor.execute(
-                    insert_statement,
-                    (
-                        transaction.transaction_date,
-                        transaction.amount,
-                        transaction.description,
-                        transaction.category_id,
-                        transaction.account_id,
-                    ),
-                )
-            print("Import Complete!")
             self.connection.commit()
             return transactions
