@@ -126,7 +126,15 @@ class Database:
         trans = cursor.fetchall()
 
         trans_list = [
-            TransactionHistory(t[0], t[1], t[2], t[3], t[4], t[5]) for t in trans
+            TransactionHistory(
+                id=t[0],
+                date=t[1],
+                amount=t[2],
+                description=t[3],
+                category_id=t[4],
+                account_id=t[5],
+            )
+            for t in trans
         ]
 
         return trans_list[:50]
