@@ -129,7 +129,7 @@ class Database:
             TransactionHistory(t[0], t[1], t[2], t[3], t[4], t[5]) for t in trans
         ]
 
-        return trans_list[:16]
+        return trans_list[:50]
 
     def import_csv(self, table, csv_file):
         cursor = self.connection.cursor()
