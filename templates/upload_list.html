@@ -9,9 +9,28 @@
 <body>
     <h1>Transactions Uploaded</h1>
 
-    {%for f in form%}
-        <p>{{f}}</p>
-    {%endfor%}
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Account</th>
+                </tr>
+            </thead>
+            <tbody>
+                {%for f in form%}
+                <tr>
+                    <td> {{f.transaction_date}} </td>
+                    <td> {{f.amount}} </td>
+                    <td> {{f.description}} </td>
+                    <td> {{f.category}} </td>
+                    <td> {{f.account}} </td>
+                </tr>
+                {%endfor%}
+            </tbody>
+        </table>
     <h2><a href="{{ url_for('home') }}">Click here to go Home</a></h2>
 </body>
 </html>

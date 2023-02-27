@@ -143,13 +143,14 @@ class Database:
         cursor = self.connection.cursor()
         with open(csv_file, "r") as file:
             lines = csv.DictReader(file)
-            transactions = [Transaction(**line).insert_value for line in lines]
+            transactions = [Transaction(**line) for line in lines]
+            insert_values = [t.insert_value for t in transactions]
 
             insert_statement = "INSERT INTO {table} (transaction_date, amount, description, category, account) VALUES(%s, %s, %s, %s, %s)".format(
                 table=table
             )
 
-            cursor.executemany(insert_statement, transactions)
+            cursor.executemany(insert_statement, insert_values)
 
             self.connection.commit()
             return transactions
