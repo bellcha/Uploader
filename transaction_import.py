@@ -125,6 +125,8 @@ class Database:
 
         trans = cursor.fetchall()
 
+        cursor.close()
+
         trans_list = [
             TransactionHistory(
                 id=t[0],
@@ -153,4 +155,5 @@ class Database:
             cursor.executemany(insert_statement, insert_values)
 
             self.connection.commit()
+            cursor.close()
             return transactions
