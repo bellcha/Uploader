@@ -109,17 +109,33 @@ class Transaction:
 
 class Database:
     def __init__(self, host, user, password, database) -> None:
+        self.host = host
+        self.user = user
+        self.password = password
+        self.database = database
+    #def __init__(self, host, user, password, database) -> None:
+        #try:
+            #self.connection = mysql.connector.connect(
+                #host=host, user=user, passwd=password, database=database
+            #)
+        #except mysql.connector.Error as e:
+            #print(f"Error connecting to Database: {e}")
+    
+    def db_connection(self) -> mysql.connector.connect():
         try:
-            self.connection = mysql.connector.connect(
-                host=host, user=user, passwd=password, database=database
+            connection = mysql.connector.connect(
+                host=self.host, user=self.user, passwd=self.password, database=self.database
             )
+            return connection
         except mysql.connector.Error as e:
             print(f"Error connecting to Database: {e}")
 
     def select_all(self, table):
         query = f"SELECT * FROM {table} ORDER BY transaction_date DESC"
 
-        cursor = self.connection.cursor()
+        conn = self.db_connection()
+
+        cursor = conn.cursor()
 
         cursor.execute(query)
 
@@ -127,7 +143,7 @@ class Database:
 
         cursor.close()
 
-        self.connection.close()
+        conn.close()
 
         trans_list = [
             TransactionHistory(
@@ -144,7 +160,7 @@ class Database:
         return trans_list[:50]
 
     def import_csv(self, table, csv_file):
-        cursor = self.connection.cursor()
+        cursor = self.db_connection().cursor()
         with open(csv_file, "r") as file:
             lines = csv.DictReader(file)
             transactions = [Transaction(**line) for line in lines]
