@@ -160,5 +160,5 @@ class Database:
 
             self.connection.commit()
 
-            self.connection.close
+            self.connection.close()
             return transactions
