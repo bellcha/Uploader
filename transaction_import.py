@@ -109,31 +109,17 @@ class Transaction:
 
 class Database:
     def __init__(self, host, user, password, database) -> None:
-        self.host = host
-        self.user = user
-        self.password = password
-        self.database = database
-    #def __init__(self, host, user, password, database) -> None:
-        #try:
-            #self.connection = mysql.connector.connect(
-                #host=host, user=user, passwd=password, database=database
-            #)
-        #except mysql.connector.Error as e:
-            #print(f"Error connecting to Database: {e}")
-    
-    def db_connection(self) -> mysql.connector:
         try:
-            connection = mysql.connector.connect(
-                host=self.host, user=self.user, passwd=self.password, database=self.database
+            self.connection = mysql.connector.connect(
+                host=host, user=user, passwd=password, database=database
             )
-            return connection
         except mysql.connector.Error as e:
             print(f"Error connecting to Database: {e}")
 
     def select_all(self, table):
         query = f"SELECT * FROM {table} ORDER BY transaction_date DESC"
 
-        conn = self.db_connection()
+        conn = self.connection
 
         cursor = conn.cursor()
 
@@ -160,7 +146,7 @@ class Database:
         return trans_list[:50]
 
     def import_csv(self, table, csv_file):
-        conn = self.db_connection()
+        conn = self.connection
         cursor = conn.cursor()
         with open(csv_file, "r") as file:
             lines = csv.DictReader(file)
@@ -178,4 +164,5 @@ class Database:
             conn.commit()
 
             conn.close()
+
             return transactions
