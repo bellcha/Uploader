@@ -160,7 +160,8 @@ class Database:
         return trans_list[:50]
 
     def import_csv(self, table, csv_file):
-        cursor = self.db_connection().cursor()
+        conn = self.db_connection()
+        cursor = conn.cursor()
         with open(csv_file, "r") as file:
             lines = csv.DictReader(file)
             transactions = [Transaction(**line) for line in lines]
@@ -174,7 +175,7 @@ class Database:
 
             cursor.close()
 
-            self.connection.commit()
+            conn.commit()
 
-            self.connection.close()
+            conn.close()
             return transactions
