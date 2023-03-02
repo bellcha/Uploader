@@ -27,11 +27,10 @@ class UploadFileForm(FlaskForm):
     submit = SubmitField("Upload File")
 
 
-db = Database(host=host, user=user, password=passwd, database=database)
-
-
 @app.route("/", methods=["GET", "POST"])
 def home():
+
+    db = Database(host=host, user=user, password=passwd, database=database)
     trans_history = db.select_all("transactions")
     return render_template("index.html", trans_history=trans_history)
 
@@ -40,6 +39,7 @@ def home():
 def upload():
     form = UploadFileForm()
 
+    db = Database(host=host, user=user, password=passwd, database=database)
     if form.validate_on_submit():
         file = form.file.data  # First grab the file
         file_upload = os.path.join(
