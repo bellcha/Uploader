@@ -121,7 +121,7 @@ class Database:
         #except mysql.connector.Error as e:
             #print(f"Error connecting to Database: {e}")
     
-    def db_connection(self) -> mysql.connector.connect():
+    def db_connection(self) -> mysql.connector:
         try:
             connection = mysql.connector.connect(
                 host=self.host, user=self.user, passwd=self.password, database=self.database
