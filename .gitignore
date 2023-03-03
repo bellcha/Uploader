@@ -3,3 +3,5 @@
 /config.ini
 /test_enum.py
 /test_sql.csv
+.DS_Store
+static/.DS_Store
