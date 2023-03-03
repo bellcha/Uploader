@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, send_from_directory
 from flask_wtf import FlaskForm
 from wtforms import FileField, SubmitField
 from werkzeug.utils import secure_filename
@@ -27,11 +27,17 @@ class UploadFileForm(FlaskForm):
     submit = SubmitField("Upload File")
 
 
+@app.route("/favicon.ico")
+def favicon():
+	return send_from_directory(os.path.join(app.root_path, 'static'),'favicon.ico',mimetype='image/vnd.microsof.icon')
+
+
 @app.route("/", methods=["GET", "POST"])
 def home():
 
     db = Database(host=host, user=user, password=passwd, database=database)
     trans_history = db.select_all("transactions")
+    print(os.path.join(app.root_path, 'static'))
     return render_template("index.html", trans_history=trans_history)
 
 
