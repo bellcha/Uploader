@@ -5,3 +5,4 @@
 /test_sql.csv
 .DS_Store
 static/.DS_Store
+static/files/test_sql.csv
