@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 from wtforms.validators import InputRequired
 import os
 import configparser
-from transaction_import import Database
+from transaction_import import Database, Category, Account
 
 config = configparser.ConfigParser()
 config.read("config.ini")
@@ -29,7 +29,11 @@ class UploadFileForm(FlaskForm):
 
 @app.route("/favicon.ico")
 def favicon():
-	return send_from_directory(os.path.join(app.root_path, 'static'),'favicon.ico',mimetype='image/vnd.microsof.icon')
+    return send_from_directory(
+        os.path.join(app.root_path, "static"),
+        "favicon.ico",
+        mimetype="image/vnd.microsof.icon",
+    )
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -37,13 +41,17 @@ def home():
 
     db = Database(host=host, user=user, password=passwd, database=database)
     trans_history = db.select_all("transactions")
-    print(os.path.join(app.root_path, 'static'))
+    print(os.path.join(app.root_path, "static"))
     return render_template("index.html", trans_history=trans_history)
 
 
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
     form = UploadFileForm()
+
+    accounts = [(" ").join(i.name.split("_")) for i in Account]
+
+    categories = [(" ").join(i.name.split("_")) for i in Category]
 
     db = Database(host=host, user=user, password=passwd, database=database)
     if form.validate_on_submit():
@@ -56,7 +64,7 @@ def upload():
         file.save(file_upload)  # Then save the file
         transactions = db.import_csv(table, file_upload)
         return render_template("upload_list.html", form=transactions)
-    return render_template("upload.html", form=form)
+    return render_template("upload.html", form=form, accounts=accounts, categories=categories)
 
 
 if __name__ == "__main__":

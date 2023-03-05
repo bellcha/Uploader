@@ -8,11 +8,39 @@
 </head>
 <body>
     <h1>Transaction History CSV File Upload</h1>
-
     <form method='POST' enctype='multipart/form-data'>
         {{form.hidden_tag()}}
         {{form.file()}}
         {{form.submit()}}
     </form>
+    <br>
+    <table style="float: left">
+        <thead>
+            <tr>
+                <th>Category</th>
+            </tr>
+        </thead>
+        <tbody>
+            {%for c in categories%}
+                <tr>
+                    <td> {{c}} </td>
+                </tr>
+            {%endfor%}
+        </tbody>
+    </table>
+    <table style="float: center"> 
+        <thead>
+            <tr>
+                <th>Account</th>
+            </tr>
+        </thead>
+        <tbody>
+            {%for a in accounts%}
+                <tr>
+                    <td> {{a}} </td>
+                </tr>
+            {%endfor%}
+        </tbody>
+    </table>
 </body>
 </html>
