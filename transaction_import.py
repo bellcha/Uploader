@@ -77,12 +77,18 @@ class Transaction:
     account: int
 
     def __post_init__(self):
-        self.transaction_date = datetime.strptime(
-            self.transaction_date.strip(), "%m/%d/%y"
-        ).strftime("%Y-%m-%d")
-        self.amount = float(self.amount)
-        self.category = self.category.strip()
-        self.account = self.account.strip()
+        try:
+            self.transaction_date = datetime.strptime(
+                self.transaction_date.strip(), "%m/%d/%y"
+            ).strftime("%Y-%m-%d")
+        except ValueError:
+            self.transaction_date = datetime.strptime(
+                self.transaction_date.strip(), "%m/%d/%Y"
+            ).strftime("%Y-%m-%d")
+        finally:
+            self.amount = float(self.amount)
+            self.category = self.category.strip()
+            self.account = self.account.strip()
 
     # Converts the Category Name to the corresponding CategoyID in the Database.
     @property
