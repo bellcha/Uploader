@@ -125,7 +125,7 @@ class Database:
             print(f"Error connecting to Database: {e}")
 
     def select_all(self, table):
-        query = f"SELECT * FROM {table} ORDER BY transaction_date DESC"
+        query = f"SELECT * FROM {table} where transaction_date between (CURDATE() - INTERVAL 2 MONTH) and CURDATE() ORDER BY transaction_date DESC"
 
         conn = self.connection
 
@@ -151,7 +151,7 @@ class Database:
             for t in trans
         ]
 
-        return trans_list[:50]
+        return trans_list
 
     def import_csv(self, table, csv_file):
         conn = self.connection
