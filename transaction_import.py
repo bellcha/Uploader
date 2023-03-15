@@ -125,7 +125,7 @@ class Database:
             print(f"Error connecting to Database: {e}")
 
     def select_all(self, table):
-        query = f"SELECT * FROM {table} where transaction_date between (CURDATE() - INTERVAL 2 MONTH) and CURDATE() ORDER BY transaction_date DESC"
+        query = f"SELECT DISTINCT id, transaction_date, amount, description, category, account FROM {table} where transaction_date between (CURDATE() - INTERVAL 2 MONTH) and CURDATE() ORDER BY transaction_date DESC"
 
         conn = self.connection
 

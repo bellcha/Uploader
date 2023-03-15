@@ -64,7 +64,9 @@ def upload():
         file.save(file_upload)  # Then save the file
         transactions = db.import_csv(table, file_upload)
         return render_template("upload_list.html", form=transactions)
-    return render_template("upload.html", form=form, accounts=accounts, categories=categories)
+    return render_template(
+        "upload.html", form=form, accounts=accounts, categories=categories
+    )
 
 
 if __name__ == "__main__":
