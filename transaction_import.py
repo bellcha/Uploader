@@ -181,13 +181,13 @@ class Database:
 
         cursor = conn.cursor()
 
-        query = "SELECT transaction_date as date, amount, description, AccountName as account, name as category from transactions left join category ca on category = ca.id left join Account acc on account = acc.AccountID"
+        query = "SELECT transaction_date, amount, description, AccountName as account, name as category from transactions left join category ca on category = ca.id left join Account acc on account = acc.AccountID"
 
         cursor.execute(query)
 
         trans = cursor.fetchall()
 
-        cols = ["date", "amount", "description", "account", "category"]
+        cols = ["transaction_date", "amount", "description", "account", "category"]
 
         df = pd.DataFrame(trans, columns=cols)
 
