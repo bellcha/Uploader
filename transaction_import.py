@@ -3,6 +3,7 @@ import mysql.connector
 from datetime import datetime
 from dataclasses import dataclass
 from enum import Enum
+import pandas as pd
 
 
 class Category(Enum):
@@ -174,3 +175,26 @@ class Database:
             conn.close()
 
             return transactions
+        
+    def get_dataframe(self) -> pd.DataFrame:
+        conn = self.connection
+
+        cursor = conn.cursor()
+
+        query = "SELECT transaction_date as date, amount, description, AccountName as account, name as category from transactions left join category ca on category = ca.id left join Account acc on account = acc.AccountID"
+
+        cursor.execute(query)
+
+        trans = cursor.fetchall()
+
+        cols = ['date', 'amount', 'description', 'account', 'category']
+        
+        df = pd.DataFrame(trans, columns=cols)
+
+        conn.close()
+
+        return df
+
+
+
+
