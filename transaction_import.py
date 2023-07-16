@@ -175,7 +175,7 @@ class Database:
             conn.close()
 
             return transactions
-        
+
     def get_dataframe(self) -> pd.DataFrame:
         conn = self.connection
 
@@ -187,14 +187,10 @@ class Database:
 
         trans = cursor.fetchall()
 
-        cols = ['date', 'amount', 'description', 'account', 'category']
-        
+        cols = ["date", "amount", "description", "account", "category"]
+
         df = pd.DataFrame(trans, columns=cols)
 
         conn.close()
 
         return df
-
-
-
-
