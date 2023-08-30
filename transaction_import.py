@@ -41,6 +41,7 @@ class Account(Enum):
     Citi_Custom_Cash_Credit_Card = 3
     Target_Red_Card = 4
     Capital_One_Savor_Card = 5
+    Avadian_Credit_Union = 6
 
 
 @dataclass
