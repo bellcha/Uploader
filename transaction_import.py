@@ -155,6 +155,29 @@ class Database:
 
         return trans_list
 
+    def get_account_values(self) -> dict:
+        query = f"SELECT * from Account"
+
+        conn = self.connection
+
+        cursor = conn.cursor()
+
+        cursor.execute(query)
+
+        accounts = cursor.fetchall()
+
+        cursor.close()
+
+        conn.close()
+
+        account_dict = dict()
+
+        for k, v in accounts:
+
+            account_dict[k] = v
+
+        return account_dict
+
     def import_csv(self, table, csv_file):
         conn = self.connection
         cursor = conn.cursor()
