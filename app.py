@@ -73,8 +73,8 @@ def upload():
         try:
             transactions = db.import_csv(table, file_upload, cats, accts)
             return render_template("upload_list.html", form=transactions)
-        except KeyError as e:
-            print(e)
+        except Exception as e:
+            print(str(e))
             return render_template("upload_error.html", error=e)
     return render_template(
         "upload.html", form=form, accounts=accounts, categories=categories
