@@ -150,7 +150,7 @@ class Database:
 
                 return transactions
             except:
-                return KeyError(f"One or more items could not be uploaded to database.") 
+                return KeyError 
 
     def get_dataframe(self) -> pd.DataFrame:
         conn = self.connection
