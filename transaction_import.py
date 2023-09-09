@@ -2,46 +2,7 @@ import csv
 import mysql.connector
 from datetime import datetime
 from dataclasses import dataclass
-from enum import Enum
 import pandas as pd
-
-
-class Category(Enum):
-    Grocery = 1
-    Subscriptions = 2
-    Entertainment = 3
-    Auto_Rental = 4
-    Merchandise = 5
-    Organizations = 6
-    Health_Care = 7
-    Other_Travel = 8
-    Vehicle_Services = 9
-    Services = 10
-    Utilities = 11
-    Restaurants = 12
-    Gas = 13
-    Lodging = 14
-    Air_Travel = 15
-    Account_Transfer = 16
-    Household_Expense = 17
-    Payroll = 18
-    Mortgage = 19
-    Credit_Card_Payment = 20
-    ATM_Cash_Withdrawl = 21
-    Account_Fee = 22
-    Interest = 23
-    Credit_Card_Rewards = 24
-    Loan_Payment = 25
-    Deposit = 26
-
-
-class Account(Enum):
-    Citi_Double_Cash_Credit_Card = 1
-    Merchants_and_Marine_Bank = 2
-    Citi_Custom_Cash_Credit_Card = 3
-    Target_Red_Card = 4
-    Capital_One_Savor_Card = 5
-    Avadian_Credit_Union = 6
 
 
 @dataclass
@@ -50,24 +11,11 @@ class TransactionHistory:
     date: datetime
     amount: float
     description: str
-    category_id: int
-    account_id: int
+    category: str
+    account: str
 
     def __post_init__(self):
         self.date = self.date.strftime("%m-%d-%Y")
-
-    @property
-    def category(self):
-        return TransactionHistory._convert_spaces(Category(self.category_id).name)
-
-    @property
-    def account(self):
-        return TransactionHistory._convert_spaces(Account(self.account_id).name)
-
-    @classmethod
-    def _convert_spaces(cls, value: str):
-        no_spaces = value.split("_")
-        return " ".join(no_spaces)
 
 
 @dataclass
@@ -77,6 +25,8 @@ class Transaction:
     description: str
     category: str
     account: int
+    category_lookup: dict
+    account_lookup: dict
 
     def __post_init__(self):
         try:
@@ -92,14 +42,13 @@ class Transaction:
             self.category = self.category.strip()
             self.account = self.account.strip()
 
-    # Converts the Category Name to the corresponding CategoyID in the Database.
     @property
     def category_id(self):
-        return Category[Transaction._convert_spaces(self.category)].value
+        return self.category_lookup[self.category]
 
     @property
     def account_id(self):
-        return Account[Transaction._convert_spaces(self.account)].value
+        return self.account_lookup[self.account]
 
     @property
     def insert_value(self):
@@ -127,7 +76,7 @@ class Database:
             print(f"Error connecting to Database: {e}")
 
     def select_all(self, table):
-        query = f"SELECT DISTINCT id, transaction_date, amount, description, category, account FROM {table} where transaction_date between (CURDATE() - INTERVAL 2 MONTH) and CURDATE() ORDER BY transaction_date DESC"
+        query = f"SELECT DISTINCT transactions.id, transaction_date, amount, description, name, AccountName FROM {table} inner join category as ca on ca.id = category inner join Account on AccountID = account where transaction_date between (CURDATE() - INTERVAL 2 MONTH) and CURDATE() ORDER BY transaction_date DESC"
 
         conn = self.connection
 
@@ -147,8 +96,8 @@ class Database:
                 date=t[1],
                 amount=t[2],
                 description=t[3],
-                category_id=t[4],
-                account_id=t[5],
+                category=t[4],
+                account=t[5],
             )
             for t in trans
         ]
@@ -173,16 +122,23 @@ class Database:
 
         for k, v in items:
 
-            table_dict[k] = v
+            table_dict[v] = k
 
         return table_dict
 
-    def import_csv(self, table, csv_file):
+    def import_csv(self, table, csv_file, category_lookup, account_lookup):
         conn = self.connection
         cursor = conn.cursor()
         with open(csv_file, "r") as file:
             lines = csv.DictReader(file)
-            transactions = [Transaction(**line) for line in lines]
+            transactions = [
+                Transaction(
+                    **line,
+                    account_lookup=account_lookup,
+                    category_lookup=category_lookup,
+                )
+                for line in lines
+            ]
             insert_values = [t.insert_value for t in transactions]
 
             insert_statement = "INSERT INTO {table} (transaction_date, amount, description, category, account) VALUES(%s, %s, %s, %s, %s)".format(

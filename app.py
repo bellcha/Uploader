@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 from wtforms.validators import InputRequired
 import os
 import configparser
-from transaction_import import Database, Category, Account
+from transaction_import import Database
 
 config = configparser.ConfigParser()
 config.read("config.ini")
@@ -20,6 +20,14 @@ table = config["MYSQL"]["TABLE"]
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "supersecretkey"
 app.config["UPLOAD_FOLDER"] = "static/files"
+
+accts = Database(host, user, passwd, database).get_values(
+    "SELECT AccountID, AccountName FROM Account"
+)
+
+cats = Database(host, user, passwd, database).get_values(
+    "SELECT id, name FROM category"
+)
 
 
 class UploadFileForm(FlaskForm):
@@ -49,9 +57,9 @@ def home():
 def upload():
     form = UploadFileForm()
 
-    accounts = [(" ").join(i.name.split("_")) for i in Account]
+    accounts = [a for a in accts]
 
-    categories = [(" ").join(i.name.split("_")) for i in Category]
+    categories = [c for c in cats]
 
     db = Database(host=host, user=user, password=passwd, database=database)
     if form.validate_on_submit():
@@ -62,7 +70,7 @@ def upload():
             secure_filename(file.filename),
         )
         file.save(file_upload)  # Then save the file
-        transactions = db.import_csv(table, file_upload)
+        transactions = db.import_csv(table, file_upload, cats, accts)
         return render_template("upload_list.html", form=transactions)
     return render_template(
         "upload.html", form=form, accounts=accounts, categories=categories
