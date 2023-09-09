@@ -139,16 +139,18 @@ class Database:
             insert_statement = "INSERT INTO {table} (transaction_date, amount, description, category, account) VALUES(%s, %s, %s, %s, %s)".format(
                 table=table
             )
+            try:
+                cursor.executemany(insert_statement, insert_values)
 
-            cursor.executemany(insert_statement, insert_values)
+                cursor.close()
 
-            cursor.close()
+                conn.commit()
 
-            conn.commit()
+                conn.close()
 
-            conn.close()
-
-            return transactions
+                return transactions
+            except:
+                return KeyError(f"One or more items could not be uploaded to database.") 
 
     def get_dataframe(self) -> pd.DataFrame:
         conn = self.connection

@@ -7,3 +7,4 @@
 static/.DS_Store
 static/files/test_sql.csv
 test_df.py
+test_sql_error.csv
