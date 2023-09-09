@@ -60,11 +60,6 @@ class Transaction:
             self.account_id,
         )
 
-    @classmethod
-    def _convert_spaces(cls, value: str):
-        no_spaces = value.split(" ")
-        return "_".join(no_spaces)
-
 
 class Database:
     def __init__(self, host, user, password, database) -> None:
