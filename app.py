@@ -57,7 +57,7 @@ def home():
 def upload():
     form = UploadFileForm()
 
-    accounts = [a for a in accts]
+    accounts = [a for a in accts if a != "Test Account"]
 
     categories = [c for c in cats]
 
