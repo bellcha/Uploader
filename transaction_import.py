@@ -7,7 +7,6 @@ import pandas as pd
 
 @dataclass
 class TransactionHistory:
-    id: int
     date: datetime
     amount: float
     description: str
@@ -19,23 +18,18 @@ class TransactionHistory:
 
 
 @dataclass
-class Transaction:
-    transaction_date: datetime
-    amount: float
-    description: str
-    category: str
-    account: int
+class Transaction(TransactionHistory):
     category_lookup: dict
     account_lookup: dict
 
     def __post_init__(self):
         try:
-            self.transaction_date = datetime.strptime(
-                self.transaction_date.strip(), "%m/%d/%y"
+            self.date = datetime.strptime(
+                self.date.strip(), "%m/%d/%y"
             ).strftime("%Y-%m-%d")
         except ValueError:
-            self.transaction_date = datetime.strptime(
-                self.transaction_date.strip(), "%m/%d/%Y"
+            self.date = datetime.strptime(
+                self.date.strip(), "%m/%d/%Y"
             ).strftime("%Y-%m-%d")
         finally:
             self.amount = float(self.amount)
@@ -53,7 +47,7 @@ class Transaction:
     @property
     def insert_value(self):
         return (
-            self.transaction_date,
+            self.date,
             self.amount,
             self.description,
             self.category_id,
@@ -71,7 +65,7 @@ class Database:
             print(f"Error connecting to Database: {e}")
 
     def select_all(self, table):
-        query = f"SELECT DISTINCT transactions.id, transaction_date, amount, description, name, AccountName FROM {table} inner join category as ca on ca.id = category inner join Account on AccountID = account where transaction_date between (CURDATE() - INTERVAL 2 MONTH) and CURDATE() ORDER BY transaction_date DESC"
+        query = f"SELECT DISTINCT transaction_date, amount, description, name, AccountName FROM {table} inner join category as ca on ca.id = category inner join Account on AccountID = account where transaction_date between (CURDATE() - INTERVAL 2 MONTH) and CURDATE() ORDER BY transaction_date DESC"
 
         conn = self.connection
 
@@ -87,12 +81,11 @@ class Database:
 
         trans_list = [
             TransactionHistory(
-                id=t[0],
-                date=t[1],
-                amount=t[2],
-                description=t[3],
-                category=t[4],
-                account=t[5],
+                date=t[0],
+                amount=t[1],
+                description=t[2],
+                category=t[3],
+                account=t[4],
             )
             for t in trans
         ]
