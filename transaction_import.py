@@ -3,6 +3,7 @@ import mysql.connector
 from datetime import datetime
 from dataclasses import dataclass
 import pandas as pd
+from contextlib import contextmanager
 
 
 @dataclass
@@ -24,13 +25,13 @@ class Transaction(TransactionHistory):
 
     def __post_init__(self):
         try:
-            self.date = datetime.strptime(
-                self.date.strip(), "%m/%d/%y"
-            ).strftime("%Y-%m-%d")
+            self.date = datetime.strptime(self.date.strip(), "%m/%d/%y").strftime(
+                "%Y-%m-%d"
+            )
         except ValueError:
-            self.date = datetime.strptime(
-                self.date.strip(), "%m/%d/%Y"
-            ).strftime("%Y-%m-%d")
+            self.date = datetime.strptime(self.date.strip(), "%m/%d/%Y").strftime(
+                "%Y-%m-%d"
+            )
         finally:
             self.amount = float(self.amount)
             self.category = self.category.strip()
@@ -64,20 +65,22 @@ class Database:
         except mysql.connector.Error as e:
             print(f"Error connecting to Database: {e}")
 
+    @contextmanager
+    def cursor(self):
+        conn = self.connection
+        try:
+            yield conn.cursor()
+        finally:
+            conn.commit()
+            conn.close()
+
     def select_all(self, table):
         query = f"SELECT DISTINCT transaction_date, amount, description, name, AccountName FROM {table} inner join category as ca on ca.id = category inner join Account on AccountID = account where transaction_date between (CURDATE() - INTERVAL 2 MONTH) and CURDATE() ORDER BY transaction_date DESC"
 
-        conn = self.connection
+        with self.cursor() as cursor:
+            cursor.execute(query)
 
-        cursor = conn.cursor()
-
-        cursor.execute(query)
-
-        trans = cursor.fetchall()
-
-        cursor.close()
-
-        conn.close()
+            trans = cursor.fetchall()
 
         trans_list = [
             TransactionHistory(
@@ -94,17 +97,10 @@ class Database:
 
     def get_values(self, query) -> dict:
 
-        conn = self.connection
+        with self.cursor() as cursor:
+            cursor.execute(query)
 
-        cursor = conn.cursor()
-
-        cursor.execute(query)
-
-        items = cursor.fetchall()
-
-        cursor.close()
-
-        conn.close()
+            items = cursor.fetchall()
 
         table_dict = dict()
 
@@ -115,8 +111,7 @@ class Database:
         return table_dict
 
     def import_csv(self, table, csv_file, category_lookup, account_lookup):
-        conn = self.connection
-        cursor = conn.cursor()
+
         with open(csv_file, "r") as file:
             lines = csv.DictReader(file)
             try:
@@ -133,13 +128,9 @@ class Database:
                 insert_statement = "INSERT INTO {table} (transaction_date, amount, description, category, account) VALUES(%s, %s, %s, %s, %s)".format(
                     table=table
                 )
-                cursor.executemany(insert_statement, insert_values)
 
-                cursor.close()
-
-                conn.commit()
-
-                conn.close()
+                with self.cursor() as cursor:
+                    cursor.executemany(insert_statement, insert_values)
 
                 return transactions
 
@@ -148,20 +139,16 @@ class Database:
                 raise KeyError(f"An error occurred: {str(e)} is invalid.")
 
     def get_dataframe(self) -> pd.DataFrame:
-        conn = self.connection
-
-        cursor = conn.cursor()
 
         query = "SELECT transaction_date, amount, description, AccountName as account, name as category from transactions left join category ca on category = ca.id left join Account acc on account = acc.AccountID"
 
-        cursor.execute(query)
+        with self.cursor() as cursor:
+            cursor.execute(query)
 
-        trans = cursor.fetchall()
+            trans = cursor.fetchall()
 
-        cols = ["transaction_date", "amount", "description", "account", "category"]
+        cols = ["date", "amount", "description", "account", "category"]
 
         df = pd.DataFrame(trans, columns=cols)
-
-        conn.close()
 
         return df
