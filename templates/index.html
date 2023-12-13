@@ -5,32 +5,68 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
+    <link rel="shortcut icon" href="{{ url_for('static',filename='favicon.ico') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007BFF;
+            color: #fff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
 </head>
-<link rel="shortcut icon" href="{{ url_for('static',filename='favicon.ico') }}">
 <body>
     <h1><a href="{{ url_for('upload') }}">Click here to Upload a CSV File</a></h1>
     <h1>Transaction History</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Amount</th>
-                    <th>Description</th>
-                    <th>Category</th>
-                    <th>Account</th>
-                </tr>
-            </thead>
-            <tbody>
-                {%for t in trans_history%}
-                <tr>
-                    <td> {{t.date}} </td>
-                    <td> {{t.amount}} </td>
-                    <td> {{t.description}} </td>
-                    <td> {{t.category}} </td>
-                    <td> {{t.account}} </td>
-                </tr>
-                {%endfor%}
-            </tbody>
-        </table>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Account</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for t in trans_history %}
+            <tr>
+                <td>{{ t.date }}</td>
+                <td>{{ t.amount }}</td>
+                <td>{{ t.description }}</td>
+                <td>{{ t.category }}</td>
+                <td>{{ t.account }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </body>
 </html>
