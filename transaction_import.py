@@ -75,7 +75,7 @@ class Database:
             conn.close()
 
     def select_all(self, table):
-        query = f"SELECT DISTINCT transaction_date, amount, description, name, AccountName FROM {table} inner join category as ca on ca.id = category inner join Account on AccountID = account where transaction_date between (CURDATE() - INTERVAL 2 MONTH) and CURDATE() ORDER BY transaction_date DESC"
+        query = f"SELECT DISTINCT transaction_date, amount, description, name, AccountName FROM {table} inner join category as ca on ca.id = category inner join Account on AccountID = account where transaction_date between (CURDATE() - INTERVAL 6 MONTH) and CURDATE() ORDER BY transaction_date DESC"
 
         with self.cursor() as cursor:
             cursor.execute(query)
